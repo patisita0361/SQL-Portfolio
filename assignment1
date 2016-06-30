@@ -1,0 +1,162 @@
+Q2. Retrieve the names of all employees from the employee table to produce output on CSV format or delimited format with a common delimeter, rather than separete columns. 
+Hint:Put the whole row into a string with a semicolon as the seperator(delimeter) between thecolumns: FORMAT:(fname;minit;lname) 
+SELECT fname || ';' || minit || ';' || lname
+FROM employee
+ORDER BY fname, minit, lname
+FNAME||';'||MINIT||';'||LNAME
+Ahmad;V;Jabbar
+Alicia;J;Zelaya
+Franklin;T;Wong
+James;E;Borg
+Jennifer;S;Wallace
+John;B;Smith
+Joyce;A;English
+New;V;Lost
+Ramesh;K;Narayan
+
+Q3. 
+Write a query  to show the employees name from the employee table in this format: first letter of the first name, followed by a dot, a blank, and the full last name
+SELECT SUBSTRING (fname FROM 1 FOR 1) || '. ' || lname
+FROM employee
+Fname from 1 for 1||’.  ‘||lname
+A. Jabbar
+A. Zelaya
+F. Wong
+J. Borg
+J. Wallace
+J. Smith
+J. English
+N. Lost
+R. Narayan
+
+Q4.
+Run a query from the employee table to find the age of the employees and the Day(Ex:Monday) they were born. You may need to update these records if Age is shown as negative.
+SELECT fname, lname, bdate, bdate DAY, CURRENT_DATE-BDATE YEAR 
+FROM employee
+ORDER BY fname, lname, bdate
+Find the names of all employees who are directly supervised by 'franklin wong'. Hint: You may need to work with CASE sensitivity. this question is repeated from previous HW.
+SELECT e1.fname AS employee, manager.fname AS manager
+FROM employee e1, employee manager
+WHERE e1.superssn=manager.ssn 
+AND manager.fname='Franklin'
+AND manager.lname='Wong'
+EMPLOYEE	MANAGER
+John	Franklyn
+Ramesh	Franklyn
+Joyce	Franklyn
+
+Q5.
+write and test a query to list the name and the total compensation(salary+commission) of all the instructors.Unknown commission should be treated as zero
+SELECT instructor_name, SUM(salary+commission)
+FROM instructor
+GROUP BY instructor_name
+INSTRUCTOR_NAME	SUM(SALARY+COMISSION)
+Steel	5250
+Sparks	4200
+Tucker	-
+Wayne	4800
+Laurel	5400
+Shelley	3700
+Caine	5850
+Lodge	2600
+Monroe	-
+Johnson	-
+Newman	3400
+Bogart	-
+Flingstone, Fred	-
+
+Q7.
+write a query to list superssn,ssn,bdate for employees was born in year 1926 or later.
+Sort the rows by asc superssn with NULL at top. For each employees, they should be sorted by desc bdate
+SELECT superssn, ssn, bdate
+FROM employee
+WHERE bdate> '01-01-1926'
+ORDER BY bdate desc, superssn asc
+SUPERESSN	SSN	BDATE
+333445555	453453453	07/31/1962
+987654321	987987987	03/29/1959
+987654321	999887777	07/19/1958
+333445555	123456789	01/09/1955
+333445555	666884444	09/15/1952
+888665555	333445555	12/08/1945
+888665555	987654321	06/20/1931
+-	888665555	11/10/1927
+
+Q8.
+Run the query from previous assignment to check the execution plan by clicking on Explain in the Query Window for HTMLDB
+"Retrieve the average salary of all female employees"
+SELECT AVG(SALARY)
+FROM employee
+WHERE sex='F'
+AVG(SALARY)
+31000
+
+Q9. You may not use oracle Execution plan to enforce the use of Index.
+--create index on the salary column in the instructor table
+SELECT instructor_name
+      ,salary*12 yearsal
+FROM   Instructor
+WHERE  salary*12 > 60000
+INSTRUCTOR_NAME	YEARSAL
+Caine	66000
+Laurel	62400
+
+Q10.
+Find maximum, minimum, average and sum of the salaries of the instructors from the instructor table
+HINT: "Each employee has only one salary, so we can only find either the salary for the specific employee or the average across the population of all employees."
+SELECT AVG(salary)
+FROM instructor
+3576.92
+SELECT MIN(salary)
+FROM instructor
+1000
+SELECT MAX(SALARY)
+FROM instructor
+5500
+SELECT SUM(salary)
+FROM instructor
+46500
+Qs#11: For each EMPLOYEE, retrieve the average hours worked from the Works_on table. List the employee SSN, Name(1st, Middle, Last) and the average hours worked, and sort the list on descending average hours worked
+-- if salary for multiple years(more than once in the DB) this query result would be outstanding
+SELECT employee.ssn, employee.fname, employee.minit, employee.lname, AVG(HOURS)
+FROM works_on, employee
+WHERE employee.ssn=works_on.essn
+GROUP BY employee.ssn, employee.fname, employee.minit, employee.lname
+ORDER BY COUNT(*) desc
+SSN              FNAME       MINIT       LNAME                  AVG(HOURS)
+333445555 Franklin         T              Wong                   7.3333333
+999887777 Alicia              J               Zelaya                20
+987654321 Jennifer         S              Wallace              17.5
+453453453 Joyce              A             English                20
+123456789 John               B              Smith                  20 
+987987987 Ahmad           V             Jabbar                 20
+888665555 James            E               Borg                     - 
+666884444 Ramesh         K              Narayan             40
+
+Q12. 
+Write a query to list the supervisor's ssn from the employee table who has the most appearance and sorted by descending count
+HInt: "most appearance means that they have most subordinates"
+SELECT manager.ssn AS manager, COUNT(*)
+FROM employee e1, employee manager
+WHERE e1.superssn=manager.ssn
+GROUP BY manager.ssn
+ORDER BY COUNT(*) desc
+
+    MANAGER     COUNT(*)
+     333445555    3
+     987654321    3
+     888665555    2
+
+Q13.
+Some instructors are mentors for other instructors. Write a query to list the instructor ID for each of the mentors and a count of how many instructors they mentor.
+SELECT mentor.instructor_id AS mentor, mentor.instructor_name  AS name, COUNT(*)
+FROM instructor i1, instructor mentor
+WHERE i1.mentor_id=mentor.instructor_id
+GROUP BY mentor.instructor_id, mentor.instructor_name
+
+MENTOR      NAME     COUNT(*)
+978                 STEEL        3
+222                 CAINE       1
+700                WAYNE      4 
+835                SPARKS      3
+
