@@ -1,0 +1,193 @@
+1.- DECLARE 
+curr_customer_first VARCHAR2(30);
+curr_customer_last VARCHAR2(30);
+curr_order_number  INTEGER;
+curr_order_date DATE;
+BEGIN
+curr_customer_first := 'Neal';
+curr_customer_last := 'Graham';
+curr_order_number := '1';
+curr_order_date := '5/27/07';
+DBMS_OUTPUT.PUT_LINE(curr_customer_first ||' ' || curr_customer_last);  
+END;
+RESULTS: Neal Graham.
+1B.- DECLARE
+curr_customer_first VARCHAR2(30);
+curr_customer_last VARCHAR2(30);
+curr_order_number INTEGER;
+curr_order_date DATE;
+order_message  STRING(100);
+BEGIN
+curr_customer_first := 'Neal';
+curr_customer_last := 'Graham';
+curr_order_number := '1';
+curr_order_date := '5/27/2007';
+order_message :=('Order'||'# '||curr_order_number|| ' was placed on ' || curr_order_date||' by '||curr_customer_first||' '||curr_customer_last);
+DBMS_OUTPUT.PUT_LINE(order_message);
+END;
+RESULTS: Order# 1 was placed on 05/27/2007 by Neal Graham
+2.- DECLARE
+curr_customer_first VARCHAR2(30) := 'Neal';
+curr_customer_last VARCHAR2(30) := 'Graham';
+curr_address VARCHAR2(30) := '9815 Circle Dr.';
+curr_city VARCHAR2(20) := 'New York';
+curr_state VARCHAR2(5) := 'NY';
+curr_zip VARCHAR2(10) :='10010';
+BEGIN
+DBMS_OUTPUT.PUT_LINE(curr_customer_first ||' '||curr_customer_last);
+DBMS_OUTPUT.PUT_LINE(curr_address);
+DBMS_OUTPUT.PUT_LINE(curr_city||', '||curr_state||' '||curr_zip);
+END;
+RESULTS: 
+ Neal Graham
+ 9815 Circle Dr.
+New York, NY 10010
+3.- DECLARE
+   curr_phone      VARCHAR2(30) := '9045551897';
+   curr_areacode   VARCHAR2(30);
+   curr_number     VARCHAR2(30);
+BEGIN
+   curr_areacode := SUBSTR(curr_phone, 1, 3);
+   DBMS_OUTPUT.PUT_LINE('The area code is: ' ||  
+   curr_areacode);
+   curr_number := SUBSTR(curr_phone, 4, 7);
+   DBMS_OUTPUT.PUT_LINE('The phone number is: ' ||  
+   curr_number);
+END;
+RESULTS:
+The area code is: 904
+The phone number is: 5551897
+4.-  DECLARE
+  year_date DATE := '1/31/06';
+  year_month VARCHAR2(9);
+  year_day VARCHAR2(30);
+  year_year VARCHAR2(30);
+  example_date STRING(100);
+BEGIN
+  year_month   := TO_CHAR(year_date, 'MONTH');
+  year_month   := RTRIM(year_month);
+  year_month   := INITCAP(year_month);
+  year_day     := SUBSTR(year_date,4,2);
+  year_year    := TO_CHAR(year_date, 'YEAR');
+  example_date :=(year_month||' '|| year_day ||', '||year_year); DBMS_OUTPUT.PUT_LINE(example_date);
+ END;
+RESULTS:  January 31, SIX
+5.- DECLARE
+inventory_ID INTEGER :='5';
+inventory_color VARCHAR2(30) := 'Sky Blue';
+inventory_price INTEGER := '259.99';
+inventory_QOH INTEGER :='23';
+BEGIN  
+DBMS_OUTPUT.PUT_LINE('Inventory ID'||': '||inventory_ID);
+DBMS_OUTPUT.PUT_LINE('Color'||': '||inventory_color);
+DBMS_OUTPUT.PUT_LINE('Price'||': $'||inventory_price);
+DBMS_OUTPUT.PUT_LINE('Quantity on Hand'||': '||inventory_QOH);
+END;
+RESULTS:
+ Inventory ID: 5
+Color: Sky Blue
+Price: $260
+Quantity on Hand: 23
+ASSIGNMENT 3B
+1.- DECLARE
+ CURSOR customer_cursor IS
+    SELECT c_first||' '||c_mi||' '||c_last||' '||c_address||' '||c_city||' '||c_state||' '||c_zip||' '||c_dphone information
+    FROM customer
+    ORDER BY c_id ASC;
+  customer_row  customer_cursor%ROWTYPE;
+BEGIN
+OPEN customer_cursor;
+DBMS_OUTPUT.PUT_LINE('Clearwater Traders Mailing List');
+LOOP  
+FETCH customer_cursor INTO customer_row;
+  DBMS_OUTPUT.PUT_LINE(customer_row.information); 
+  EXIT WHEN customer_cursor%NOTFOUND;
+END LOOP;
+CLOSE customer_cursor; 
+END;
+RESULTS: 
+Clearwater Traders Mailing List
+Neal R Graham 9815 Circle Dr. Tallahassee FL 32308 9045551897
+Myra T Sanchez 172 Alto Park Seattle WA 42180 4185551791
+Lisa M Smith 850 East Main Santa Ana CA 51875 3075557841
+Paul  Phelp 994 Kirkman Rd. Northpoint NY 11795 4825554788
+Sheila A Lewis 195 College Blvd. Newton GA 37812 3525554972
+Thomas E James 348 Rice Lane Radcliff WY 87195 7615553485
+Thomas E James 348 Rice Lane Radcliff WY 87195 7615553485
+2.- DECLARE
+ CURSOR order_cursor IS
+    SELECT  DISTINCT order_line.o_id||' '||item.item_desc information
+    FROM item, inventory, order_line
+    WHERE inventory.item_id = item.item_id AND order_line.inv_id=inventory.inv_id
+    ORDER BY information asc;
+order_row  order_cursor%ROWTYPE;
+BEGIN
+OPEN order_cursor;
+LOOP  
+FETCH order_cursor INTO order_row;
+  DBMS_OUTPUT.PUT_LINE(order_row.information); 
+   EXIT WHEN order_cursor%NOTFOUND;
+END LOOP;
+CLOSE order_cursor; 
+END;
+RESULTS: 
+1 3-Season Tent
+1 Women's Fleece Pullover
+2 Children's Beachcomber Sandals
+3 Men's Expedition Parka
+4 Women's Fleece Pullover
+5 Women's Fleece Pullover
+5 Women's Hiking Shorts
+6 3-Season Tent
+6 Women's Hiking Shorts
+6 Women's Hiking Shorts
+3.-  DECLARE
+original_amount INTEGER ;
+discounted_amount INTEGER;
+ CURSOR amount_cursor IS
+    SELECT   order_line.o_id||' '||original_amount||' '||discounted_amount information
+    FROM order_line, inventory
+    WHERE inventory.inv_id = order_line.inv_id;
+amount_row  amount_cursor%ROWTYPE;
+BEGIN
+original_amount:=inventory.inv_price*order_line.ol_quantity;
+IF original_amount>100 THEN discounted_amount :=original_amount*0.10;
+ELSIF
+  original_amount>200 THEN discounted_amount:=original_amount*0.20;
+OPEN amount_cursor;
+LOOP
+ FETCH amount_cursor INTO amount_row;
+  DBMS_OUTPUT.PUT_LINE(amount_row.information); 
+ EXIT WHEN amount_cursor%NOTFOUND;
+END LOOP;
+CLOSE amount_cursor;
+END IF; 
+END;
+
+4.-  DECLARE
+ CURSOR inventory_cursor IS
+    SELECT  DISTINCT inventory.inv_id||' '||inventory.item_id||' '||item.item_desc||' '|| inventory.inv_price information
+    FROM item, inventory
+    WHERE inventory.item_id = item.item_id AND item.item_desc= 'Men''s Expedition Parka'
+    ORDER BY information asc;
+inventory_row  inventory_cursor%ROWTYPE;
+BEGIN
+OPEN inventory_cursor;
+LOOP  
+FETCH inventory_cursor INTO inventory_row;
+  DBMS_OUTPUT.PUT_LINE(inventory_row.information);     
+  EXIT WHEN inventory_cursor%NOTFOUND;
+END LOOP;
+CLOSE inventory_cursor; 
+EXCEPTION
+WHEN no_data_found
+THEN
+RAISE_APPLICATION_ERROR(-2001,'There is no match for your query');
+END;
+RESULTS: 
+23 1 Men's Expedition Parka 199.95
+24 1 Men's Expedition Parka 199.95
+25 1 Men's Expedition Parka 209.95
+26 1 Men's Expedition Parka 209.95
+26 1 Men's Expedition Parka 209.95LTS: 
+
