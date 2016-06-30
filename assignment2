@@ -1,0 +1,110 @@
+Queries
+a.-  Retrieve the names of all employees in department 5 who work more than 10 hours per week on the ‘ProductX’ project.
+SELECT employee.fname, employee.lname
+FROM employee, works_on, project
+WHERE ssn=essn AND pno=pnumber AND hours>10 AND pname='ProductX' AND dno='5'
+FNAME	LNAME
+John	Smith
+Joyce	English
+
+b.- List the names of all employees who have a dependent with the same first name as themselves.
+SELECT employee.fname, employee.lname	
+FROM employee, dependent
+WHERE employee.fname=dependent.dependent_name
+FNAME	LNAME
+John	Smith
+
+c.- Find the names of all employees who are directly supervised by ‘Franklin Wong’.
+SELECT e1.fname AS employee, manager.fname AS manager
+FROM employee e1, employee manager
+WHERE e1.superssn=manager.ssn 
+AND manager.fname='Franklin'
+EMPLOYEE	MANAGER
+Jonh	Franklyn
+Ramesh	Franklyn
+Joyce	Franklyn
+
+d.- For each project, list the project name and the total hours per week (by all employees) spent on the project.
+SELECT project.pname, SUM(HOURS)
+FROM project, works_on
+WHERE project.pnumber=works_on.pno
+GROUP BY project.pname
+PNAME	SUM(HOURS)
+Computerization	55
+ProductZ	50
+ProductY	37.5
+ProductX	54.5
+Reorganization	25
+Newbenefits	57
+
+e.- Retrieve the names of all employees who work on every project.
+SELECT employee.fname, COUNT (*)
+FROM employee, works_on
+WHERE essn=ssn
+GROUP BY employee.fname 
+HAVING COUNT(*)>5
+FNAME	COUNT(*)
+Franklyn	6
+
+f.- Retrieve the names of all employees who do not work on any project.
+SELECT employee.fname, COUNT (*)
+FROM employee, works_on
+WHERE essn=ssn
+GROUP BY employee.fname
+HAVING COUNT(*)=0
+g.- For each department, retrieve the department name and the average salary of all employees working in that department.
+SELECT department.dname, AVG(SALARY)
+FROM employee, department
+WHERE dno=dnumber
+GROUP BY department.dname
+DNAME	AVG(SALARY)
+Research	33250
+Administration	28250
+Headquarters	55000
+
+h.- Retrieve the average salary of all female employees.
+SELECT AVG (SALARY)
+FROM employee
+WHERE sex='F'
+AVG(SALARY)
+31000
+
+i.- Find the names and addresses of all employees who work on at least one project located in Houston but whose department has no location in Houston.
+SELECT Distinct employee.fname, employee.address
+FROM employee, works_on, project, dept_locations
+WHERE pno=pnumber AND plocation='Houston' AND essn=ssn
+AND dept_locations!='Houston' AND dnumber=dno
+
+j.- List the last names of all department managers who have no dependents.
+SELECT DISTINCT manager.fname AS manager1
+FROM employee e1, employee manager
+WHERE manager.ssn=e1.superssn
+
+AND NOT EXISTS (SELECT *
+                  FROM dependent
+                  WHERE essn=manager.ssn)
+FNAME
+James
+
+4) a.- For each department whose average employee salary is more than $30,000, retrieve the department name and the number of employees working for that department.
+SELECT dname, employeeCOUNT(*)
+FROM department, employee
+WHERE (SELECT department.dname, AVG(SALARY)
+ FROM department, employee
+ WHERE dno=dnumber AND 
+ AVG(SALARY)>30000)
+b.- Suppose that we want the number of male employees in each department rather than all employees (as in Exercise 8.14 (a)). Can we specify this query in SQL? Why or why not.
+SELECT department.dname, count(*)
+FROM employee, department
+WHERE dno=dnumber AND sex='M'
+GROUP BY department.dname
+DNAME	COUNT(*)
+Reasearch	3
+Administration	2
+Headquarters	1
+
+
+
+
+
+
